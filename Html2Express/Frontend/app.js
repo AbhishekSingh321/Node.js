@@ -1,7 +1,9 @@
 let list=document.querySelector('ul')
 let para=document.querySelector('p')
+let form=document.querySelector('form')
+let input=document.querySelector('.val')
 
-fetch('http://catfact.ninja/fact')
+fetch('https://catfact.ninja/fact')
 .then(res=>res.json())
 .then(data=>{
   para.innerHTML=data.fact
@@ -12,13 +14,31 @@ async function load(){
   try{
     let res = await fetch('http://localhost:3000')
     let data = await res.json()
-    list.innerHTML=data.map(name => `<li>${name}</li>`).join('')
+    list.innerHTML=data.map(item => `<li>${item.name || item}</li>`).join('')
   }
   catch(err){
     list.innerHTML='<h1>Server Down</h1>'
     console.log('Something Wrong ',err)
   }
 }
-
 load()
+
+async function posting(value){
+  const payload = { name: value };
+    const res = await fetch('http://localhost:3000', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+  })
+}
+
+form.addEventListener('submit',async(e)=>{
+  e.preventDefault()
+  const value = input.value.trim();
+  if (!value) return;
+  await posting(value)
+  await load()
+  form.reset()
+})
+
 
